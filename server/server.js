@@ -42,6 +42,8 @@ io.on('connection', (socket) => {
             }
         })
     })
+
+
     socket.on('roomChangeInfo', updatedUser =>{
         socket.broadcast.emit('roomChangeInfo',updatedUser)
         allUsers.forEach(user =>{
@@ -71,11 +73,11 @@ io.on('connection', (socket) => {
                 roomUsers.push(user)
             }
         })
+        console.log(allUsers)
+        console.log(roomUsers)
         socket.broadcast.emit('allUsers',allUsers,test);
         io.emit('userRoom',roomUsers,room);
     })
-
-
     socket.on('leaveRoom',(room,user)=>{
         socket.leave(room)
         roomUsers.forEach(user =>{
@@ -85,9 +87,8 @@ io.on('connection', (socket) => {
         })
         allUsers.push(user);
         io.emit('allUsers',allUsers,test);
-        socket.broadcast.emit('userRoom',roomUsers,room);
+        socket.to(room).emit('userRoom',roomUsers,room);
     })
-
 
 
     socket.on('disconnect', () => {

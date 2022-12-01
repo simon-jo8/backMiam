@@ -98,6 +98,13 @@ function changeNameList(user) {
         }
     })
 }
+function resetNameList(){
+    let li = document.querySelectorAll('[data-id]')
+    li.forEach((li) =>{
+        li.remove()
+    })
+}
+
 function removeName(userId) {
     let li = document.querySelectorAll('[data-id]')
     li.forEach(li =>{
@@ -106,14 +113,32 @@ function removeName(userId) {
         }
     })
 }
+let myRoom
 
+let Room = document.getElementById('joinRoom')
+Room.addEventListener("click", function () {
+    myRoom = document.getElementById('myRoom').value
+    document.getElementById('roomId').innerHTML = 'Room n° ' + myRoom;
+    currentUser[0].room = myRoom
+    socket.emit('join',myRoom)
+},false)
+
+let leaveRoom = document.getElementById('leaveRoom')
+leaveRoom.addEventListener('click', function(){
+    let Room = document.getElementById('myRoom')
+    Room.value = "";
+    let lastRoom = currentUser[0].room
+    currentUser[0].room = "";
+    socket.emit('leaveRoom',lastRoom,currentUser[0])
+    currentUser[0].room =""
+},false)
 
 // Fonction d'initialisation de la carte
 function initMap() {
     let lat = finish[0]
     let lng = finish[1]
     var polylines = [];
-    let myRoom
+
     let markerPosition = [];
     let markerPositionR = []
 
@@ -129,21 +154,6 @@ function initMap() {
         socket.emit('nameChange', currentUser[0])
     })
 
-    let Room = document.getElementById('joinRoom')
-    Room.addEventListener("click", function () {
-        myRoom = document.getElementById('myRoom').value
-        document.getElementById('roomId').innerHTML = 'Room n° ' + myRoom;
-        currentUser[0].room = myRoom
-        socket.emit('join',myRoom)
-    })
-
-    let leaveRoom = document.getElementById('leaveRoom')
-    leaveRoom.addEventListener('click', function(){
-        let Room = document.getElementById('myRoom')
-        Room.value = "";
-        socket.emit('leaveRoom',currentUser[0].room,currentUser[0])
-        currentUser[0].room =""
-    })
 
     let button = document.querySelectorAll('.button')
     let buttonItems;
@@ -156,7 +166,7 @@ function initMap() {
             initMap()
             algoDistance()
             socket.emit('restauChange', currentUser[0])
-        });
+        },false);
     });
 
     CurrentName()
@@ -320,9 +330,7 @@ socket.on("connect",connectedUsers=>{
 })
 
 socket.on('allUsers', (users,room)=>{
-    console.log(room)
     if (currentUser[0].room === ""){
-        console.log('hi')
         nextUsers = [];
         users.forEach(user =>{
             if (user.id !== currentUser[0].id){
@@ -330,25 +338,17 @@ socket.on('allUsers', (users,room)=>{
             }
         })
         allUser()
-        // if (users.length > 1) {
-        //     macarte.remove();
-        //     initMap();
-        //     let clearLi = document.querySelectorAll('[data-id]');
-        //     clearLi.forEach(li =>{li.remove()
-        //         console.log('remove')});
-        //     nameNextUser()
-        // }
         macarte.remove();
         initMap();
         let clearLi = document.querySelectorAll('[data-id]');
-        clearLi.forEach(li =>{li.remove()
-            console.log('remove')});
+        clearLi.forEach(li =>{li.remove()});
         nameNextUser()
         algoDistance()
     }
 })
 
 socket.on('userRoom', (users,room)=>{
+    console.log(room)
     if(currentUser[0].room === room){
         nextUsers = [];
         users.forEach(user =>{
@@ -357,6 +357,7 @@ socket.on('userRoom', (users,room)=>{
             }
         })
         allUser()
+        resetNameList()
         nameNextUser()
         macarte.remove();
         initMap();
