@@ -1,0 +1,120 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+* {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+input[type="color"] {
+  opacity: 1;
+  width: 20%;
+  height: 32px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#map {
+  /* la carte DOIT avoir une hauteur sinon elle n'apparaît pas */
+  width: 60%;
+  height: 90vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+#roomId {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  min-height: 30px;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.miam {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.miam__left {
+  width: 20%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.miam__left__room {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: 15px;
+  width: 90%;
+}
+
+.miam__left__room input {
+  padding: 10px 0 10px 10px;
+}
+
+.miam__left ul li {
+  cursor: pointer;
+  background-color: rgba(15, 15, 15, 0.89);
+  color: white;
+  padding: 15px 0 15px 10px;
+  margin-top: 15px;
+  -webkit-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+
+.miam__left ul li:first-child {
+  margin-top: 0;
+}
+
+.miam__left ul li:hover {
+  background-color: rgba(15, 15, 15, 0.95);
+}
+
+.miam__left__restau ul {
+  padding-left: 5px;
+}
+
+.miam__left__restau ul li {
+  cursor: pointer;
+  background-color: rgba(15, 15, 15, 0.89);
+  color: white;
+  padding: 15px 0 15px 10px;
+  margin-top: 15px;
+  width: 90%;
+  -webkit-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+
+.miam__left__restau ul li:hover {
+  background-color: rgba(15, 15, 15, 0.95);
+}
+
+.miam__map {
+  width: 60%;
+}
+/*# sourceMappingURL=style.css.map */
