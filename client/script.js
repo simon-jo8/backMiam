@@ -6,14 +6,7 @@ import io from 'socket.io-client'
 const messageInput = document.getElementById('message-input')
 const form = document.getElementById("form")
 
-form.addEventListener('submit', e => {
-    e.preventDefault()
-    const message = messageInput.value
 
-    if (message === "") return
-    displayMessageSend(message)
-    socket.emit('send-message', message)
-})
 
 function displayMessageSend(message) {
     const div = document.createElement("p")
@@ -108,6 +101,18 @@ function allUser() {
         allUsers.push(element)
     })
 }
+
+
+form.addEventListener('submit', e => {
+    e.preventDefault()
+    const message = messageInput.value
+
+    if (message === "") return
+
+
+    displayMessageSend(message)
+    socket.emit('send-message', message, currentUser[0].room)
+})
 
 allUser()
 
@@ -383,8 +388,21 @@ const socket = io('http://localhost:3000')
 // chatbox
 
 socket.on('receive-message', message => {
-    displayMessageReceive(message)
+    if (currentUser[0].room === '') {
+        displayMessageReceive(message)
+    }
+
 })
+
+
+socket.on('receive-message-room', (message, room) => {
+    if (currentUser[0].room === room) {
+        displayMessageReceive(message)
+
+    }
+
+})
+
 
 socket.on("connect", connectedUsers => {
     currentUser[0].id = socket.id

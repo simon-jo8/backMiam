@@ -89,8 +89,15 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('userRoom', roomUsers, room);
     });
 
-    socket.on("send-message", message => {
-        socket.broadcast.emit('receive-message', message)
+
+
+    socket.on("send-message", (message, room) => {
+        if (room === '') {
+            console.log('non')
+            socket.broadcast.emit('receive-message', message)
+        } else {
+            socket.broadcast.emit('receive-message-room', message, room)
+        }
     })
 
 
