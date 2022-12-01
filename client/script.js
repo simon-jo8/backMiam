@@ -2,6 +2,37 @@ import * as L from "leaflet/dist/leaflet-src.esm.js"
 import io from 'socket.io-client'
 
 
+// chatbox
+const messageInput = document.getElementById('message-input')
+const form = document.getElementById("form")
+
+form.addEventListener('submit', e => {
+    e.preventDefault()
+    const message = messageInput.value
+
+    if (message === "") return
+    displayMessageSend(message)
+    socket.emit('send-message', message)
+})
+
+function displayMessageSend(message) {
+    const div = document.createElement("p")
+    div.classList.add("send")
+    div.textContent = message
+    document.getElementById("message-container").append(div)
+}
+
+
+
+function displayMessageReceive(message) {
+    const div = document.createElement("p")
+    div.classList.add("receive")
+    div.textContent = message
+    document.getElementById("message-container").append(div)
+}
+
+
+
 let macarte;
 let coordsUser;
 // icones
@@ -57,8 +88,8 @@ let currentUser = [
         "depart": depart,
         "restaurant": restaurant,
         "time": 0,
-        "id":"0",
-        "room":"",
+        "id": "0",
+        "room": "",
     },
 ]
 
@@ -68,7 +99,7 @@ let nextUsers = [
 
 let allUsers = [];
 
-function allUser(){
+function allUser() {
     allUsers = [];
     currentUser.forEach(element => {
         allUsers.push(element)
@@ -87,28 +118,28 @@ nameNextUser()
 
 function nameNextUser() {
     for (let i = 0; i < nextUsers.length; i++) {
-        document.getElementById('nameNextUsers').innerHTML += '<li id="timeStart' + [i + 1] + '" data-id="'+nextUsers[i].id +'">' + nextUsers[i].name + '</li>';
+        document.getElementById('nameNextUsers').innerHTML += '<li id="timeStart' + [i + 1] + '" data-id="' + nextUsers[i].id + '">' + nextUsers[i].name + '</li>';
     }
 }
 function changeNameList(user) {
     let li = document.querySelectorAll('[data-id]')
-    li.forEach(li =>{
-        if(li.getAttribute('data-id') === user.id){
+    li.forEach(li => {
+        if (li.getAttribute('data-id') === user.id) {
             li.innerHTML = user.name
         }
     })
 }
-function resetNameList(){
+function resetNameList() {
     let li = document.querySelectorAll('[data-id]')
-    li.forEach((li) =>{
+    li.forEach((li) => {
         li.remove()
     })
 }
 
 function removeName(userId) {
     let li = document.querySelectorAll('[data-id]')
-    li.forEach(li =>{
-        if(li.getAttribute('data-id') === userId){
+    li.forEach(li => {
+        if (li.getAttribute('data-id') === userId) {
             li.remove()
         }
     })
@@ -120,18 +151,18 @@ Room.addEventListener("click", function () {
     myRoom = document.getElementById('myRoom').value
     document.getElementById('roomId').innerHTML = 'Room n° ' + myRoom;
     currentUser[0].room = myRoom
-    socket.emit('join',myRoom)
-},false)
+    socket.emit('join', myRoom)
+}, false)
 
 let leaveRoom = document.getElementById('leaveRoom')
-leaveRoom.addEventListener('click', function(){
+leaveRoom.addEventListener('click', function () {
     let Room = document.getElementById('myRoom')
     Room.value = "";
     let lastRoom = currentUser[0].room
     currentUser[0].room = "";
-    socket.emit('leaveRoom',lastRoom,currentUser[0])
-    currentUser[0].room =""
-},false)
+    socket.emit('leaveRoom', lastRoom, currentUser[0])
+    currentUser[0].room = ""
+}, false)
 
 // Fonction d'initialisation de la carte
 function initMap() {
@@ -146,12 +177,29 @@ function initMap() {
     changeName.addEventListener("change", function () {
         name = document.getElementById('myName').value
         currentUser[0].name = document.getElementById('myName').value;
-        CurrentName();
-        markerPosition.forEach(element => {
-            macarte.removeLayer(element)
-        })
-        markers();
-        socket.emit('nameChange', currentUser[0])
+
+
+
+        if (currentUser[0].name != "") {
+            CurrentName();
+            markerPosition.forEach(element => {
+                macarte.removeLayer(element)
+            })
+            markers();
+
+            socket.emit('nameChange', currentUser[0])
+        } else {
+            name = "Anonyme"
+            currentUser[0].name = "Anonyme"
+            CurrentName();
+            markerPosition.forEach(element => {
+                macarte.removeLayer(element)
+            })
+            markers();
+
+            socket.emit('nameChange', currentUser[0])
+        }
+
     })
 
 
@@ -162,17 +210,26 @@ function initMap() {
         item.addEventListener('click', function () {
             restaurant = [restaurantMap[idx].lat, restaurantMap[idx].long]
             currentUser[0].restaurant = restaurant;
+
+            let remove = document.querySelectorAll('.button')
+            remove.forEach(element => {
+                element.style.backgroundColor = 'black'
+            })
+
+            item.style.backgroundColor = 'red'
+
             macarte.remove()
             initMap()
             algoDistance()
             socket.emit('restauChange', currentUser[0])
-        },false);
+        }, false);
     });
 
     CurrentName()
 
     function CurrentName() {
         document.getElementById('currentIdName').innerHTML = name;
+
     }
 
     // Créer l'objet "macarte" et l'insèrer dans l'élément HTML qui a l'ID "map"
@@ -195,7 +252,7 @@ function initMap() {
             macarte.removeLayer(element)
         })
         line()
-        socket.emit('changeFinish', finish,currentUser[0].room);
+        socket.emit('changeFinish', finish, currentUser[0].room);
         algoDistance()
     });
 
@@ -230,12 +287,14 @@ function initMap() {
     function markers() {
         // Nous parcourons la liste des villes
         nextUsers.forEach(e => {
+
             markerPosition.push(L.marker([e.depart[0], e.depart[1]], { icon: IconUsers }).addTo(macarte).bindTooltip(e.name + '<br/>',
                 {
                     permanent: true,
                     direction: 'right'
                 }));
             markerPositionR.push(L.marker([e.restaurant[0], e.restaurant[1]], { icon: IconRestaurant }).addTo(macarte).bindPopup(e.name));
+
         });
 
         currentUser.forEach(e => {
@@ -244,11 +303,10 @@ function initMap() {
                     permanent: true,
                     direction: 'right'
                 }));
-            if (restaurant[0] !== '48.843523789371154' ) {
+            if (restaurant[0] !== '48.843523789371154') {
                 markerPositionR.push(L.marker([restaurant[0], restaurant[1]], { icon: IconRestaurant }).addTo(macarte).bindPopup(name));
-            } else {
-
             }
+
         })
 
     }
@@ -262,7 +320,7 @@ function getPosition() {
 }
 
 
-function algoDistance(){
+function algoDistance() {
     const meetTime = new Date();
     meetTime.setHours(13)
     meetTime.setMinutes(0);
@@ -270,44 +328,45 @@ function algoDistance(){
     const vitesse = 5;
     let timesstart = [];
 
-    function getDistance(user,finish){
-        return macarte.distance(user,finish)
+    function getDistance(user, finish) {
+        return macarte.distance(user, finish)
     }
 
-    function getDistanceUserFinish(user){
+    function getDistanceUserFinish(user) {
         let userPos = user.depart;
         let restoPos = user.restaurant;
-        let userRestaurant = getDistance(userPos,restoPos)
-        let restoFinish = getDistance(restoPos,finish);
+        let userRestaurant = getDistance(userPos, restoPos)
+        let restoFinish = getDistance(restoPos, finish);
         let totalD = userRestaurant + restoFinish;
-        return (totalD/1000)
+        return (totalD / 1000)
     }
 
-    function getTime(distance){
-        let time = (distance/vitesse)*3600
+    function getTime(distance) {
+        let time = (distance / vitesse) * 3600
         return time
     }
 
-    function getTimeToLeave(time,meetTime){
+    function getTimeToLeave(time, meetTime) {
         let newDate = new Date(meetTime.getTime() - time * 1000)
         return newDate
     }
 
-    function timeUser(){
-        allUsers.forEach((user) =>{
+    function timeUser() {
+        allUsers.forEach((user) => {
             let distance = getDistanceUserFinish(user);
             let time = getTime(distance);
-            let departTime = getTimeToLeave(time,meetTime)
+            let departTime = getTimeToLeave(time, meetTime)
+            console.log(user.name + " doit partir à " + departTime)
             timesstart.push(departTime)
         })
 
         let li = document.querySelectorAll('[data-id]')
-        li.forEach(user =>{
+        li.forEach(user => {
             for (let i = 0; i < nextUsers.length; i++) {
-                document.getElementById('timeStart' + [i + 1]).innerHTML = nextUsers[i].name + '<br>Doit partir à '+timesstart[i + 1].toLocaleTimeString() +' pour arriver à 13h'
+                document.getElementById('timeStart' + [i + 1]).innerHTML = nextUsers[i].name + '<br>Doit partir à ' + timesstart[i + 1].toLocaleTimeString() + ' pour arriver à 13h'
             }
         })
-        document.getElementById('nameId').innerHTML = '<span id="currentIdName">'+currentUser[0].name+'</span> </br> Doit partir à '+timesstart[0].toLocaleTimeString() +' pour arriver à 13h'
+        document.getElementById('nameId').innerHTML = '<span id="currentIdName">' + currentUser[0].name + '</span> </br> Doit partir à ' + timesstart[0].toLocaleTimeString() + ' pour arriver à 13h'
 
     }
 
@@ -315,25 +374,35 @@ function algoDistance(){
 
 }
 
+
+
+
+
 const socket = io('http://localhost:3000')
 
-socket.on("connect",connectedUsers=>{
+// chatbox
+
+socket.on('receive-message', message => {
+    displayMessageReceive(message)
+})
+
+socket.on("connect", connectedUsers => {
     currentUser[0].id = socket.id
-    getPosition().then((res) =>{
-        coordsUser = [res.coords.latitude + (Math.random(0.1)/10),res.coords.longitude + (Math.random(0.1)/10)];
+    getPosition().then((res) => {
+        coordsUser = [res.coords.latitude + (Math.random(0.1) / 10), res.coords.longitude + (Math.random(0.1) / 10)];
         currentUser[0].depart = coordsUser;
         // currentUser[0].restaurant = coordsUser;
-        socket.emit('newUser', currentUser )
+        socket.emit('newUser', currentUser)
         initMap();
         algoDistance()
     });
 })
 
-socket.on('allUsers', (users,room)=>{
-    if (currentUser[0].room === ""){
+socket.on('allUsers', (users, room) => {
+    if (currentUser[0].room === "") {
         nextUsers = [];
-        users.forEach(user =>{
-            if (user.id !== currentUser[0].id){
+        users.forEach(user => {
+            if (user.id !== currentUser[0].id) {
                 nextUsers.push(user)
             }
         })
@@ -341,18 +410,18 @@ socket.on('allUsers', (users,room)=>{
         macarte.remove();
         initMap();
         let clearLi = document.querySelectorAll('[data-id]');
-        clearLi.forEach(li =>{li.remove()});
+        clearLi.forEach(li => { li.remove() });
         nameNextUser()
         algoDistance()
     }
 })
 
-socket.on('userRoom', (users,room)=>{
+socket.on('userRoom', (users, room) => {
     console.log(room)
-    if(currentUser[0].room === room){
+    if (currentUser[0].room === room) {
         nextUsers = [];
-        users.forEach(user =>{
-            if (user.id !== currentUser[0].id){
+        users.forEach(user => {
+            if (user.id !== currentUser[0].id) {
                 nextUsers.push(user)
             }
         })
@@ -362,20 +431,20 @@ socket.on('userRoom', (users,room)=>{
         macarte.remove();
         initMap();
         algoDistance()
-    }else{
     }
 })
 
-socket.on('changeFinish',(finishPoint,room) =>{
+
+socket.on('changeFinish', (finishPoint, room) => {
     finish = finishPoint;
     macarte.remove()
     initMap()
     algoDistance()
 })
 
-socket.on('nameChange',updatedUser =>{
-    nextUsers.forEach(user =>{
-        if(user.id === updatedUser.id){
+socket.on('nameChange', updatedUser => {
+    nextUsers.forEach(user => {
+        if (user.id === updatedUser.id) {
             user.name = updatedUser.name
         }
     })
@@ -384,18 +453,18 @@ socket.on('nameChange',updatedUser =>{
     initMap()
     algoDistance()
 })
-socket.on('roomChangeInfo',updatedUser =>{
-    nextUsers.forEach(user =>{
-        if(user.id === updatedUser.id){
+socket.on('roomChangeInfo', updatedUser => {
+    nextUsers.forEach(user => {
+        if (user.id === updatedUser.id) {
             user.room = updatedUser.room
         }
     })
     changeNameList(updatedUser)
 })
 
-socket.on('restauChange',updatedUser =>{
-    nextUsers.forEach(user =>{
-        if(user.id === updatedUser.id){
+socket.on('restauChange', updatedUser => {
+    nextUsers.forEach(user => {
+        if (user.id === updatedUser.id) {
             user.restaurant = updatedUser.restaurant
         }
     })
@@ -403,11 +472,15 @@ socket.on('restauChange',updatedUser =>{
     initMap()
 })
 
-socket.on('removeName',removeNameId =>{
+socket.on('removeName', removeNameId => {
     removeName(removeNameId)
     macarte.remove()
     initMap()
 })
+
+
+
+
 
 
 

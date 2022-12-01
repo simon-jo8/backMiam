@@ -5,50 +5,69 @@
     <meta charset="utf-8">
     <!-- Nous chargeons les fichiers CDN de Leaflet. Le CSS AVANT le JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
-          integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-          crossorigin="" />
+        integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin="" />
     <link rel="stylesheet" href="style.css">
     <title>Carte</title>
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
-            integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-            crossorigin=""></script>
-    <script src="/script.js" type="module"/>
+        integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+    <script src="/script.js" type="module" />
 
 
 </head>
 
 <body>
-<div class="miam">
-    <div class="miam__left">
-        <div class="miam__left__restau">
-            <ul>
-                <li class="button">Kebab tah les anciens</li>
-                <li class="button">Tacos tah les anciens</li>
-                <li class="button">Grec tah les anciens</li>
+    <div class="miam">
+        <div class="miam__left">
+            <div class="miam__left__restau">
+                <ul>
+                    <li class="button" id="restau0">Kebab tah les anciens</li>
+                    <li class="button" id="restau1">Tacos tah les anciens</li>
+                    <li class="button" id="restau2">Grec tah les anciens</li>
+                </ul>
+            </div>
+            <div class="miam__left__room">
+                <label for="myName">Changer votre nom :</label>
+                <input id="myName" type="text">
+
+                <label for="myRoom">Accéder à votre room :</label>
+                <input id="myRoom" type="text">
+            </div>
+        </div>
+        <div id="map" class="miam__map">
+            <!-- Ici s'affichera la carte -->
+        </div>
+        <div class="miam__left">
+            <ul id="nameNextUsers">
+                <li id="roomId">Nom de la room :</li>
+                <li id="nameId"><span id="currentIdName"></span></li>
             </ul>
         </div>
-        <div class="miam__left__room">
-            <label for="myName">Changer votre nom :</label>
-            <input id="myName" type="text">
+    </div>
 
-            <label for="myRoom">Accéder à votre room :</label>
-            <input id="myRoom" type="text">
-            <div id="joinRoom"> Join Room</div>
-            <div id="leaveRoom"> Quitter la room</div>
+    <div id="joinRoom"> Join Room</div>
+    <div id="leaveRoom"> Quitter la room</div>
+    <div class="chat">
+        <div class="chat__title">
+            <h3>ChatBox</h3>
+        </div>
+
+        <div class="chat__box" id="message-container">
+
+        </div>
+
+        <div class="chat_input">
+            <form id="form">
+                <input type="text" maxlength="144" id="message-input">
+                <button type="submit" id="send-button">Send</button>
+            </form>
         </div>
     </div>
-    <div id="map" class="miam__map">
-        <!-- Ici s'affichera la carte -->
-    </div>
-    <div class="miam__left">
-        <ul id="nameNextUsers">
-            <li id="roomId">Nom de la room :</li>
-            <li id="nameId"><span id="currentIdName"></span></li>
-        </ul>
-    </div>
-</div>
 
-<!-- Fichiers Javascript -->
+
+    <!-- Fichiers Javascript -->
+
 
 </body>
 

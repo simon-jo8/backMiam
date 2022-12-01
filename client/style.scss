@@ -75,7 +75,7 @@ input[type="color"] {
 
                 &:hover {
                     background-color: rgba(15, 15, 15, 0.95);
-                ;
+                    ;
                 }
             }
         }
@@ -97,7 +97,7 @@ input[type="color"] {
 
                     &:hover {
                         background-color: rgba(15, 15, 15, 0.95);
-                    ;
+                        ;
                     }
                 }
             }
@@ -106,5 +106,60 @@ input[type="color"] {
 
     &__map {
         width: 60%;
+    }
+}
+
+
+
+.chat {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgb(233, 233, 233);
+    width: 350px;
+    min-height: 200px;
+
+    transition: all 0.2S linear;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    h3 {
+        margin: 10px 0 0 10px;
+        text-align: center;
+        background-color: rgb(81, 81, 255);
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        margin: 0;
+        padding: 20px;
+        color: white;
+    }
+
+    &__box {
+        max-height: 300px;
+        overflow-y: scroll;
+
+        .send {
+            background-color: rgb(81, 81, 255);
+            word-wrap: break-word;
+            width: 50%;
+            padding: 10px 15px;
+            margin-right: 5px;
+            margin-left: auto;
+            color: white;
+            border-radius: 15px;
+        }
+
+        .receive {
+            background-color: rgb(138, 207, 74);
+            word-wrap: break-word;
+            width: 50%;
+            padding: 10px 15px;
+            margin-right: auto;
+            margin-left: 5px;
+            color: white;
+            border-radius: 15px;
+        }
     }
 }
