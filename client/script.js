@@ -129,12 +129,20 @@ function initMap() {
         socket.emit('nameChange', currentUser[0])
     })
 
-    let Room = document.getElementById('myRoom')
-    Room.addEventListener("change", function () {
+    let Room = document.getElementById('joinRoom')
+    Room.addEventListener("click", function () {
         myRoom = document.getElementById('myRoom').value
         document.getElementById('roomId').innerHTML = 'Room n° ' + myRoom;
         currentUser[0].room = myRoom
         socket.emit('join',myRoom)
+    })
+
+    let leaveRoom = document.getElementById('leaveRoom')
+    leaveRoom.addEventListener('click', function(){
+        let Room = document.getElementById('myRoom')
+        Room.value = "";
+        socket.emit('leaveRoom',currentUser[0].room,currentUser[0])
+        currentUser[0].room =""
     })
 
     let button = document.querySelectorAll('.button')
@@ -144,7 +152,6 @@ function initMap() {
         item.addEventListener('click', function () {
             restaurant = [restaurantMap[idx].lat, restaurantMap[idx].long]
             currentUser[0].restaurant = restaurant;
-
             macarte.remove()
             initMap()
             algoDistance()
@@ -281,11 +288,9 @@ function algoDistance(){
             let distance = getDistanceUserFinish(user);
             let time = getTime(distance);
             let departTime = getTimeToLeave(time,meetTime)
-            console.log(user.name  + " doit partir à " + departTime)
             timesstart.push(departTime)
         })
-        console.log(allUsers);
-        console.log(nextUsers);
+
         let li = document.querySelectorAll('[data-id]')
         li.forEach(user =>{
             for (let i = 0; i < nextUsers.length; i++) {
@@ -315,8 +320,9 @@ socket.on("connect",connectedUsers=>{
 })
 
 socket.on('allUsers', (users,room)=>{
-    console.log(currentUser[0].room, room)
+    console.log(room)
     if (currentUser[0].room === ""){
+        console.log('hi')
         nextUsers = [];
         users.forEach(user =>{
             if (user.id !== currentUser[0].id){
@@ -324,30 +330,40 @@ socket.on('allUsers', (users,room)=>{
             }
         })
         allUser()
+        // if (users.length > 1) {
+        //     macarte.remove();
+        //     initMap();
+        //     let clearLi = document.querySelectorAll('[data-id]');
+        //     clearLi.forEach(li =>{li.remove()
+        //         console.log('remove')});
+        //     nameNextUser()
+        // }
+        macarte.remove();
+        initMap();
+        let clearLi = document.querySelectorAll('[data-id]');
+        clearLi.forEach(li =>{li.remove()
+            console.log('remove')});
         nameNextUser()
-        if (users.length > 1) {
-            macarte.remove();
-            initMap();
-        }
-        algoDistance()
-    }else if(currentUser[0].room === room){
-        console.log(room)
-        nextUsers = [];
-        users.forEach(user =>{
-            if (user.id !== currentUser[0].id){
-                nextUsers.push(user)
-            }
-        })
-        allUser()
-        nameNextUser()
-        if (users.length > 1) {
-            macarte.remove();
-            initMap();
-        }
         algoDistance()
     }
 })
 
+socket.on('userRoom', (users,room)=>{
+    if(currentUser[0].room === room){
+        nextUsers = [];
+        users.forEach(user =>{
+            if (user.id !== currentUser[0].id){
+                nextUsers.push(user)
+            }
+        })
+        allUser()
+        nameNextUser()
+        macarte.remove();
+        initMap();
+        algoDistance()
+    }else{
+    }
+})
 
 socket.on('changeFinish',(finishPoint,room) =>{
     finish = finishPoint;
@@ -360,7 +376,6 @@ socket.on('nameChange',updatedUser =>{
     nextUsers.forEach(user =>{
         if(user.id === updatedUser.id){
             user.name = updatedUser.name
-            console.log(allUsers)
         }
     })
     changeNameList(updatedUser)

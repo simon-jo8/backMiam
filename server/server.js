@@ -25,16 +25,15 @@ server.listen(3000, () => {
     console.log('run in 3000');
 });
 
-
 io.on('connection', (socket) => {
     socket.on('newUser', user =>{
-        console.log(user)
         allUsers.push(user[0])
         io.emit('allUsers',allUsers,test)
         if(allUsers.length > 1 && finishPoint){
             io.emit('changeFinish', finishPoint)
         }
     })
+
     socket.on('nameChange', updatedUser =>{
         socket.broadcast.emit('nameChange',updatedUser)
         allUsers.forEach(user =>{
@@ -60,7 +59,6 @@ io.on('connection', (socket) => {
             }
         })
     })
-
     socket.on('changeFinish', (finish,room) =>{
         socket.broadcast.emit('changeFinish',finish,room)
         finishPoint = finish;
@@ -73,9 +71,24 @@ io.on('connection', (socket) => {
                 roomUsers.push(user)
             }
         })
-        io.emit('allUsers',allUsers,test);
-        io.emit('allUsers',roomUsers,room);
+        socket.broadcast.emit('allUsers',allUsers,test);
+        io.emit('userRoom',roomUsers,room);
     })
+
+
+    socket.on('leaveRoom',(room,user)=>{
+        socket.leave(room)
+        roomUsers.forEach(user =>{
+            if(user.id === socket.id){
+                roomUsers.splice(allUsers.indexOf(user),1)
+            }
+        })
+        allUsers.push(user);
+        io.emit('allUsers',allUsers,test);
+        socket.broadcast.emit('userRoom',roomUsers,room);
+    })
+
+
 
     socket.on('disconnect', () => {
         allUsers.forEach(user =>{
@@ -87,4 +100,5 @@ io.on('connection', (socket) => {
         io.emit('removeName', socket.id)
       });
 });
+
 
