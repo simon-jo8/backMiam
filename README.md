@@ -1,10 +1,20 @@
-# backMiam
-1. Lancer le serveur : 
-cd server/
+# BackMiam
+**By Simon JOSEPH et Adrien BOUTEILLER**
+Réalisé en Node Js/ Javascript
+
+## Installation
+Server
+
+```sh
+cd server
 npm i
 npm run start
+```
 
-2. Lancer le client : 
-cd client/
+Client
+
+```sh
+cd client
 npm i
-npx snowpack dev
+npx snowpack dev /npm run start
+```
