@@ -102,18 +102,6 @@ function allUser() {
     })
 }
 
-
-form.addEventListener('submit', e => {
-    e.preventDefault()
-    const message = messageInput.value
-
-    if (message === "") return
-
-
-    displayMessageSend(message)
-    socket.emit('send-message', message, currentUser[0].room)
-})
-
 allUser()
 
 form.addEventListener('submit', e => {
@@ -404,11 +392,8 @@ socket.on('receive-message', message => {
 socket.on('receive-message-room', (message, room) => {
     if (currentUser[0].room === room) {
         displayMessageReceive(message)
-
     }
-
 })
-
 socket.on("connect", connectedUsers => {
     currentUser[0].id = socket.id
     getPosition().then((res) => {
