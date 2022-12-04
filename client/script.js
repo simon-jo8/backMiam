@@ -401,8 +401,6 @@ socket.on('receive-message', message => {
 
 })
 
-<<<<<<< Updated upstream
-
 socket.on('receive-message-room', (message, room) => {
     if (currentUser[0].room === room) {
         displayMessageReceive(message)
@@ -411,14 +409,6 @@ socket.on('receive-message-room', (message, room) => {
 
 })
 
-
-=======
-socket.on('receive-message-room', (message, room) => {
-    if (currentUser[0].room === room) {
-        displayMessageReceive(message)
-    }
-})
->>>>>>> Stashed changes
 socket.on("connect", connectedUsers => {
     currentUser[0].id = socket.id
     getPosition().then((res) => {

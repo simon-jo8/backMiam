@@ -129,19 +129,6 @@ io.on('connection', (socket) => {
         io.emit('allUsers', allUsers, test);
     });
 
-<<<<<<< Updated upstream
-
-
-    socket.on("send-message", (message, room) => {
-        if (room === '') {
-            console.log('non')
-            socket.broadcast.emit('receive-message', message)
-        } else {
-            socket.broadcast.emit('receive-message-room', message, room)
-        }
-    })
-=======
->>>>>>> Stashed changes
 
     socket.on("send-message", (message, room) => {
         console.log(message,room)
