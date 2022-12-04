@@ -116,6 +116,14 @@ form.addEventListener('submit', e => {
 
 allUser()
 
+form.addEventListener('submit', e => {
+    e.preventDefault()
+    const message = messageInput.value
+    if (message === "") return
+    displayMessageSend(message)
+    socket.emit('send-message', message,currentUser[0].room)
+})
+
 
 let finish = [48.8512, 2.349903]
 
@@ -156,7 +164,8 @@ Room.addEventListener("click", function () {
     myRoom = document.getElementById('myRoom').value
     document.getElementById('roomId').innerHTML = 'Room n° ' + myRoom;
     currentUser[0].room = myRoom
-    socket.emit('join', myRoom)
+    console.log('hi')
+    socket.emit('join', myRoom, currentUser[0])
 }, false)
 
 let leaveRoom = document.getElementById('leaveRoom')
@@ -251,8 +260,6 @@ function initMap() {
         lat = marker.getLatLng().lat;
         lng = marker.getLatLng().lng;
         finish = [marker.getLatLng().lat, marker.getLatLng().lng]
-
-
         polylines.forEach(element => {
             macarte.removeLayer(element)
         })
@@ -394,6 +401,7 @@ socket.on('receive-message', message => {
 
 })
 
+<<<<<<< Updated upstream
 
 socket.on('receive-message-room', (message, room) => {
     if (currentUser[0].room === room) {
@@ -404,6 +412,13 @@ socket.on('receive-message-room', (message, room) => {
 })
 
 
+=======
+socket.on('receive-message-room', (message, room) => {
+    if (currentUser[0].room === room) {
+        displayMessageReceive(message)
+    }
+})
+>>>>>>> Stashed changes
 socket.on("connect", connectedUsers => {
     currentUser[0].id = socket.id
     getPosition().then((res) => {
@@ -414,6 +429,7 @@ socket.on("connect", connectedUsers => {
         initMap();
         algoDistance()
     });
+    console.log(currentUser)
 })
 
 socket.on('allUsers', (users, room) => {
@@ -434,8 +450,8 @@ socket.on('allUsers', (users, room) => {
     }
 })
 
+
 socket.on('userRoom', (users, room) => {
-    console.log(room)
     if (currentUser[0].room === room) {
         nextUsers = [];
         users.forEach(user => {
@@ -444,20 +460,33 @@ socket.on('userRoom', (users, room) => {
             }
         })
         allUser()
-        resetNameList()
-        nameNextUser()
         macarte.remove();
         initMap();
+        let clearLi = document.querySelectorAll('[data-id]');
+        clearLi.forEach(li => { li.remove() });
+        nameNextUser()
         algoDistance()
     }
 })
 
 
 socket.on('changeFinish', (finishPoint, room) => {
-    finish = finishPoint;
-    macarte.remove()
-    initMap()
-    algoDistance()
+    console.log('done')
+    if (currentUser[0].room === ""){
+        finish = finishPoint;
+        macarte.remove()
+        initMap()
+        algoDistance()
+    }
+})
+
+socket.on('changeFinishRoom', (finishPoint, room) => {
+    if (currentUser[0].room === room){
+        finish = finishPoint;
+        macarte.remove()
+        initMap()
+        algoDistance()
+    }
 })
 
 socket.on('nameChange', updatedUser => {

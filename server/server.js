@@ -62,33 +62,74 @@ io.on('connection', (socket) => {
         })
     })
     socket.on('changeFinish', (finish, room) => {
-        socket.broadcast.emit('changeFinish', finish, room)
-
-        finishPoint = finish;
+        if (room !== ""){
+            io.to(room).emit('changeFinishRoom',finish,room)
+        }else{
+            finishPoint = finish;
+            socket.broadcast.emit('changeFinish', finish, room)
+        }
     })
 
-    socket.on('join', room => {
+    socket.on('join', (room,user) => {
+        socket.join(room);
         allUsers.forEach(user => {
             if (user.id === socket.id) {
                 allUsers.splice(allUsers.indexOf(user), 1)
-                roomUsers.push(user)
             }
         })
-        socket.broadcast.emit('allUsers', allUsers, test);
-        io.emit('userRoom', roomUsers, room);
+        let addRoom =
+            {
+                "id":room,
+                "users":[user],
+            }
+        if (roomUsers.length>0){
+            roomUsers.forEach(Room =>{
+                if(Room.id === room){
+                    Room.users.push(user)
+                    io.in(room).emit('userRoom', Room.users, room)
+                    socket.broadcast.emit('allUsers', allUsers, test);
+
+                }else{
+                    roomUsers.push(addRoom)
+                    io.in(room).emit('userRoom', addRoom.users, room)
+                    socket.broadcast.emit('allUsers', allUsers, test);
+
+                }
+            })
+        }else{
+            roomUsers.push(addRoom)
+            io.in(room).emit('userRoom', addRoom.users, room)
+            socket.broadcast.emit('allUsers', allUsers, test);
+        }
     })
-    socket.on('leaveRoom', (room, user) => {
+
+
+
+    socket.on('leaveRoom', (room, newUser) => {
         socket.leave(room)
-        roomUsers.forEach(user => {
-            if (user.id === socket.id) {
-                roomUsers.splice(allUsers.indexOf(user), 1)
+        roomUsers.forEach(Room =>{
+            if(Room.id === room){
+                Room.users.forEach(User =>{
+                    if (User.id === newUser.id){
+                        Room.users.splice(Room.users.indexOf(User),1)
+                    }
+                })
+                io.in(room).emit('userRoom', Room.users, room)
+            }
+            if(Room.users == null){
+                roomUsers.splice(roomUsers.indexOf(Room),1)
             }
         })
-        allUsers.push(user);
+        allUsers.push(newUser);
+        if (room !== ""){
+            console.log('done')
+            socket.broadcast.emit('changeFinish', finishPoint, room)
+        }else{
+        }
         io.emit('allUsers', allUsers, test);
-        socket.broadcast.emit('userRoom', roomUsers, room);
     });
 
+<<<<<<< Updated upstream
 
 
     socket.on("send-message", (message, room) => {
@@ -99,7 +140,18 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('receive-message-room', message, room)
         }
     })
+=======
+>>>>>>> Stashed changes
 
+    socket.on("send-message", (message, room) => {
+        console.log(message,room)
+        if (room === "") {
+            console.log('non')
+            socket.broadcast.emit('receive-message', message)
+        } else {
+            socket.broadcast.emit('receive-message-room', message, room)
+        }
+    })
 
     socket.on('disconnect', () => {
         allUsers.forEach(user => {
@@ -111,3 +163,4 @@ io.on('connection', (socket) => {
         io.emit('removeName', socket.id)
     });
 });
+
